@@ -1,5 +1,9 @@
 <template>
   <div class="hello container">
+    <div>
+      <b-form-select v-model="selected" :options="options"></b-form-select>
+    </div>
+
     <input
       type="text"
       class="form form-control"
@@ -17,7 +21,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="d in ports" v-bind:key="d.id">
+        <tr v-for="d in filteredPorts" v-bind:key="d.id">
           <td>{{ d.id }}</td>
           <td>{{ d.name }}</td>
           <td>{{ d.country }}</td>
@@ -36,7 +40,17 @@ export default {
     return {
       pageNumber: 1,
       ports: [],
+      filteredPorts: [],
       message: "",
+      selected: "",
+      options: [
+        { value: null, text: "Please select an option" },
+        { value: "id", text: "Id" },
+        { value: "name", text: "Name" },
+        { value: "country", text: "Country" },
+        { value: "continent", text: "Continent" },
+        { value: "coordinates", text: "Coordinates" },
+      ],
     };
   },
   methods: {
@@ -46,10 +60,16 @@ export default {
       );
       const data = await res.json();
       this.ports = data.data;
-      console.log(this.ports);
+      this.filteredPorts = this.ports;
     },
     filterData() {
-      console.log(this.ports.filter((port) => port.name === this.message));
+      this.filteredPorts = this.ports.filter((port) =>
+        port[this.selected]
+          .toString()
+          .toLowerCase()
+          .includes(this.message.toString().toLowerCase())
+      );
+      console.log(this.filteredPorts);
     },
   },
   mounted() {
