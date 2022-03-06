@@ -1,6 +1,12 @@
 <template>
-  <div class="hello">
-    <table class="table table-dark table-striped">
+  <div class="hello container">
+    <input
+      type="text"
+      class="form form-control"
+      @keyup="filterData()"
+      v-model="message"
+    />
+    <table class="table table-striped">
       <thead>
         <tr>
           <th scope="col">Id</th>
@@ -30,6 +36,7 @@ export default {
     return {
       pageNumber: 1,
       ports: [],
+      message: "",
     };
   },
   methods: {
@@ -40,6 +47,9 @@ export default {
       const data = await res.json();
       this.ports = data.data;
       console.log(this.ports);
+    },
+    filterData() {
+      console.log(this.ports.filter((port) => port.name === this.message));
     },
   },
   mounted() {
