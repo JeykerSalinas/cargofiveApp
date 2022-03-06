@@ -10,26 +10,21 @@
       @keyup="filterData()"
       v-model="message"
     />
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th scope="col">Id</th>
-          <th scope="col">Name</th>
-          <th scope="col">Country</th>
-          <th scope="col">Continent</th>
-          <th scope="col">Coordinates</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="d in filteredPorts" v-bind:key="d.id">
-          <td>{{ d.id }}</td>
-          <td>{{ d.name }}</td>
-          <td>{{ d.country }}</td>
-          <td>{{ d.continent }}</td>
-          <td>{{ d.coordinates }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="overflow-auto">
+      <b-table
+        id="my-table"
+        :items="filteredPorts"
+        :per-page="perPage"
+        :current-page="currentPage"
+        small
+      ></b-table>
+      <b-pagination
+        v-model="currentPage"
+        :total-rows="rows"
+        :per-page="perPage"
+        @change="onPageChange"
+      ></b-pagination>
+    </div>
   </div>
 </template>
 
@@ -38,7 +33,10 @@ export default {
   name: "HelloWorld",
   data() {
     return {
-      pageNumber: 1,
+      perPage: null,
+      currentPage: 1,
+      numberOfPages: 25,
+      rows: null,
       ports: [],
       filteredPorts: [],
       message: "",
@@ -54,13 +52,17 @@ export default {
     };
   },
   methods: {
-    async getData() {
+    async getData(pageNumber) {
       const res = await fetch(
-        `http://apitest.cargofive.com/api/ports?page=${this.pageNumber}`
+        `http://apitest.cargofive.com/api/ports?page=${pageNumber}`
       );
       const data = await res.json();
       this.ports = data.data;
       this.filteredPorts = this.ports;
+      this.currentPage = data.meta.current_page;
+      this.perPage = data.meta.per_page;
+      this.numberOfPages = data.meta.last_page;
+      this.rows = data.meta.total;
     },
     filterData() {
       this.filteredPorts = this.ports.filter((port) =>
@@ -69,11 +71,15 @@ export default {
           .toLowerCase()
           .includes(this.message.toString().toLowerCase())
       );
-      console.log(this.filteredPorts);
+    },
+    onPageChange(page) {
+      this.currentPage = page;
+      this.getData(this.currentPage);
+      console.log(page);
     },
   },
   mounted() {
-    this.getData();
+    this.getData(this.currentPage);
   },
 };
 </script>
