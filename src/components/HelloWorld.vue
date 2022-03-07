@@ -1,19 +1,34 @@
 <template>
-  <div class="hello container">
-    <div>
-      <b-form-select v-model="selected" :options="options"></b-form-select>
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-center">
+      <img
+        src="https://cargofive.com/wp-content/uploads/2018/07/logo.svg"
+        alt="Logo cargofive"
+        class="w-25"
+      />
+    </div>
+    <div class="d-flex align-items-center justify-content-end my-4">
+      <div>
+        <b-form-select
+          class="py-2 me-3"
+          v-model="selected"
+          :options="options"
+        ></b-form-select>
+      </div>
+      <div class="w-25">
+        <input
+          type="text"
+          class="form form-control"
+          @keyup="filterData()"
+          v-model="message"
+          :disabled="selected === null"
+          placeholder="Search"
+        />
+      </div>
     </div>
 
-    <input
-      type="text"
-      class="form form-control"
-      @keyup="filterData()"
-      v-model="message"
-      :disabled="selected === null"
-      placeholder="Buscar"
-    />
     <div class="overflow-auto">
-      <table class="table table-dark table-striped">
+      <table class="table table-ligth table-striped">
         <thead>
           <tr>
             <th scope="col">Id</th>
@@ -38,6 +53,7 @@
         :total-rows="rows"
         :per-page="perPage"
         @change="onPageChange"
+        align="center"
       ></b-pagination>
     </div>
   </div>
@@ -57,7 +73,7 @@ export default {
       message: "",
       selected: null,
       options: [
-        { value: null, text: "Filtrar por" },
+        { value: null, text: "Filter by" },
         { value: "id", text: "Id" },
         { value: "name", text: "Name" },
         { value: "country", text: "Country" },
