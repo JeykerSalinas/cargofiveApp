@@ -9,15 +9,30 @@
       class="form form-control"
       @keyup="filterData()"
       v-model="message"
+      :disabled="selected === null"
+      placeholder="Buscar"
     />
     <div class="overflow-auto">
-      <b-table
-        id="my-table"
-        :items="filteredPorts"
-        :per-page="perPage"
-        :current-page="currentPage"
-        small
-      ></b-table>
+      <table class="table table-dark table-striped">
+        <thead>
+          <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Name</th>
+            <th scope="col">Country</th>
+            <th scope="col">Continent</th>
+            <th scope="col">Coordinates</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="d in filteredPorts" v-bind:key="d.id">
+            <td>{{ d.id }}</td>
+            <td>{{ d.name }}</td>
+            <td>{{ d.country }}</td>
+            <td>{{ d.continent }}</td>
+            <td>{{ d.coordinates }}</td>
+          </tr>
+        </tbody>
+      </table>
       <b-pagination
         v-model="currentPage"
         :total-rows="rows"
@@ -40,9 +55,9 @@ export default {
       ports: [],
       filteredPorts: [],
       message: "",
-      selected: "",
+      selected: null,
       options: [
-        { value: null, text: "Please select an option" },
+        { value: null, text: "Filtrar por" },
         { value: "id", text: "Id" },
         { value: "name", text: "Name" },
         { value: "country", text: "Country" },
@@ -65,11 +80,14 @@ export default {
       this.rows = data.meta.total;
     },
     filterData() {
+      this.ports.map((a) => {
+        a[this.selected] === null ? (a[this.selected] = "") : a[this.selected];
+      });
       this.filteredPorts = this.ports.filter((port) =>
         port[this.selected]
           .toString()
           .toLowerCase()
-          .includes(this.message.toString().toLowerCase())
+          .includes(this.message.toString().toLowerCase().trim())
       );
     },
     onPageChange(page) {
